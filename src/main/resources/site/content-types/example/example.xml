@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<content-type>
+  <display-name>Example</display-name>
+  <super-type>base:structured</super-type>
+  <form>
+    <input name="text" type="TextLine">
+      <label>Text</label>
+      <occurrences minimum="1" maximum="1"/>
+      <help-text>Example text</help-text>
+    </input>
+  </form>
+</content-type>
