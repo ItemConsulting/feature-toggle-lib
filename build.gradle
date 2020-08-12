@@ -20,9 +20,6 @@ publishing {
 
 dependencies {
     compile "com.enonic.xp:script-api:${xpVersion}"
-    // add other compile dependencies here
-    // compile "com.foo.mypackage:artifact-name:1.0.0"
-
     testCompile "com.enonic.xp:testing:${xpVersion}"
     testCompile 'org.mockito:mockito-core:2.+'
     testCompile 'junit:junit:4.12'
