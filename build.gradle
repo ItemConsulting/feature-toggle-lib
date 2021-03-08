@@ -20,6 +20,11 @@ publishing {
 
 dependencies {
     compile "com.enonic.xp:script-api:${xpVersion}"
+
+    compile "com.enonic.xp:lib-node:${xpVersion}"
+    compile "com.enonic.xp:lib-repo:${xpVersion}"
+    compile "com.enonic.xp:lib-context:${xpVersion}"
+
     testCompile "com.enonic.xp:testing:${xpVersion}"
     testCompile 'org.mockito:mockito-core:2.+'
     testCompile 'junit:junit:4.12'
