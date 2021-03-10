@@ -15,7 +15,7 @@ const createRepo = function() {
     id: FEATURE_TOGGLE_REPO,
     rootPermissions: [
       {
-        'principal': 'role:admin',
+        'principal': 'role:system.admin',
         'allow': [
           'READ',
           'CREATE',
@@ -53,6 +53,20 @@ const createRepo = function() {
           'READ_PERMISSIONS',
           'WRITE_PERMISSIONS'
         ]
+      },
+      {
+        'principal': 'role:system.everyone',
+        'allow': [
+          'READ',
+        ],
+        'deny': [
+          'CREATE',
+          'MODIFY',
+          'DELETE',
+          'PUBLISH',
+          'READ_PERMISSIONS',
+          'WRITE_PERMISSIONS'
+        ]
       }
     ]
   })
@@ -68,7 +82,6 @@ const createBranch = function(branch) {
 exports.connect = function() {
   const context = contextLib.get()
   let repo = getRepo()
-
   if(!repo) {
     repo = createRepo()
   }
