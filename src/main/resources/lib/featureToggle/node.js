@@ -98,3 +98,15 @@ exports.connect = function() {
     branch: context.branch
   })
 }
+
+exports.runAsAdmin = function(cb, branch = FEATURE_TOGGLE_DRAFT) {
+  contextLib.run({
+    repository: FEATURE_TOGGLE_REPO,
+    branch: branch,
+    user: {
+      login: 'su',
+      idProvider: 'system'
+    },
+    principal: ['role:system.admin']
+  }, cb)
+}
