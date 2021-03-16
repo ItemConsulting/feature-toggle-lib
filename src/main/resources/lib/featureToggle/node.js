@@ -79,7 +79,7 @@ const createBranch = function(branch) {
   })
 }
 
-exports.connect = function() {
+exports.connect = function(branch) {
   const context = contextLib.get()
   let repo = getRepo()
   if(!repo) {
@@ -95,7 +95,7 @@ exports.connect = function() {
 
   return nodeLib.connect({
     repoId: FEATURE_TOGGLE_REPO,
-    branch: context.branch
+    branch: branch || context.branch
   })
 }
 

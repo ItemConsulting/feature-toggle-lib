@@ -79,14 +79,18 @@ function getSpaces() {
     count: 100
   }).hits
   return spaces.map((space) => {
-    return connection.get(space.id)
+    const repoSpace = connection.get(space.id)
+    return {
+      _id: repoSpace._id,
+      _name: repoSpace._name
+    }
   })
 }
 
 exports.getSpaces = getSpaces
 
-function getFeatures(space) {
-  const connection = node.connect()
+function getFeatures(space, branch) {
+  const connection = node.connect(branch)
   const features = connection.findChildren({
     parentKey: `/${space}`,
     start: 0,
