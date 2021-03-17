@@ -111,7 +111,7 @@ exports.update = update;
 
 /**
  * @description update features
- * @param {{space: string, feature: string, enabled: boolean}} options
+ * @param {{space: string, feature: string}} options
  */
 function publishFeature(options) {
   if (options) {
@@ -125,12 +125,14 @@ function publishFeature(options) {
       if (!repoFeature) {
         throw new Error(`no feature ${options.feature} in space ${options.space}`);
       }
-      connection.push({
+      const res = connection.push({
         key: repoFeature._id,
         target: 'master',
       });
+      return res.failed.length === 0
     });
   }
+  return false
 }
 
 exports.publishFeature = publishFeature;

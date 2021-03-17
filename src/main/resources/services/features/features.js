@@ -20,7 +20,7 @@ exports.get = function (req) {
 
 exports.post = function(req) {
   const data = JSON.parse(req.body)
-  if (!data.space || !data.branch || !data.feature || typeof data.enabled === undefined) {
+  if (!data.space || !data.feature || typeof data.enabled === undefined) {
     return {
       body: {
         message: 'Missing parameter',
