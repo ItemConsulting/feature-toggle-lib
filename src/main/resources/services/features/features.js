@@ -19,7 +19,8 @@ exports.get = function (req) {
 };
 
 exports.post = function(req) {
-  if (!req.data.space || !req.data.branch || !req.data.feature || typeof req.data.enabled === undefined) {
+  const data = JSON.parse(req.body)
+  if (!data.space || !data.branch || !data.feature || typeof data.enabled === undefined) {
     return {
       body: {
         message: 'Missing parameter',
@@ -30,7 +31,11 @@ exports.post = function(req) {
   }
   return {
     body: {
-      features: featureToggleLib.getFeatures(req.params.space, req.params.branch),
+      feature: featureToggleLib.update({
+        space: data.space,
+        feature: data.feature,
+        enabled: data.enabled
+      }),
     },
     contentType: 'application/json',
   };

@@ -26,10 +26,11 @@ exports.isEnabled = function(featureKey, defaultValue = false) {
     return feature.data.enabled
   }
 
+  // TODO create only for draft not master
   create({
     key: featureKey,
     space: space,
-    value: defaultValue
+    enabled: defaultValue
   })
 
   return defaultValue
@@ -37,7 +38,7 @@ exports.isEnabled = function(featureKey, defaultValue = false) {
 
 /**
  * @description Create features
- * @param {Array<{space: string, key: string, value: boolean}> | {space: string, key: string, value: boolean}} options 
+ * @param {Array<{space: string, key: string, enabled: boolean}> | {space: string, key: string, enabled: boolean}} options 
  */
 function create(options) {
   if(options) {
@@ -60,7 +61,7 @@ function create(options) {
             _name: feature.key,
             _parentPath: `/${feature.space}`,
             data: {
-              enabled: !!feature.value
+              enabled: !!feature.enabled
             }
           })
         }
@@ -70,6 +71,41 @@ function create(options) {
 }
 
 exports.create = create
+
+/**
+ * @description update features
+ * @param {{space: string, feature: string, enabled: boolean}} options 
+ */
+function update(options) {
+  if(options) {
+    return node.runAsAdmin(() => {
+      const connection = node.connect('draft')
+      const repoSpace = connection.get(`/${options.space}`)
+      if(!repoSpace) {
+        throw new Error(`no space ${options.space}`)
+      }
+      const repoFeature = connection.get(`/${options.space}/${options.feature}`)
+      if(!repoFeature) {
+        throw new Error(`no feature ${options.feature} in space ${options.space}`)
+      }
+      const modifiedNode = connection.modify({
+        key: repoFeature._id,
+        editor: (repoNode) => {
+          repoNode.data.enabled = options.enabled
+          return repoNode
+        }
+      })
+
+      return {
+        _id: modifiedNode._id,
+        _name: modifiedNode._name,
+        enabled: modifiedNode.data.enabled
+      }
+    })
+  }
+}
+
+exports.update = update
 
 function getSpaces() {
   const connection = node.connect()
