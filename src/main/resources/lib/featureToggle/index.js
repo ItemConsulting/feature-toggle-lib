@@ -19,23 +19,27 @@ function getKey() {
 }
 
 exports.isEnabled = function (featureKey, defaultValue = false) {
-  const context = contextLib.get();
-  const connection = node.connect();
-  const space = getKey();
-  const feature = connection.get(`/${space}/${featureKey}`);
-  if (feature) {
-    return feature.data.enabled;
+  try {
+    const context = contextLib.get();
+    const connection = node.connect();
+    const space = getKey();
+    const feature = connection.get(`/${space}/${featureKey}`);
+    if (feature) {
+      return feature.data.enabled;
+    }
+  
+    if (context.branch === 'draft') {
+      create({
+        key: featureKey,
+        space: space,
+        enabled: defaultValue,
+      });
+    }
+    return defaultValue;
+  } catch(e) {
+    return defaultValue
   }
 
-  if (context.branch === 'draft') {
-    create({
-      key: featureKey,
-      space: space,
-      enabled: defaultValue,
-    });
-  }
-
-  return defaultValue;
 };
 
 /**
@@ -55,6 +59,7 @@ function create(options) {
           connection.create({
             _name: feature.space,
             _parentPath: '/',
+            _inheritsPermissions: true,
           });
         }
         const featureNode = connection.get(`/${feature.space}/${feature.key}`);
@@ -62,6 +67,7 @@ function create(options) {
           connection.create({
             _name: feature.key,
             _parentPath: `/${feature.space}`,
+            _inheritsPermissions: true,
             data: {
               enabled: !!feature.enabled,
             },

@@ -6,6 +6,77 @@ const FEATURE_TOGGLE_REPO = 'com.gravitondigital.feature-toggle'
 const FEATURE_TOGGLE_MASTER = 'master'
 const FEATURE_TOGGLE_DRAFT = 'draft'
 
+const PERMISSIONS = [
+  {
+    'principal': 'role:system.admin',
+    'allow': [
+      'READ',
+      'CREATE',
+      'MODIFY',
+      'DELETE',
+      'PUBLISH',
+      'READ_PERMISSIONS',
+      'WRITE_PERMISSIONS'
+    ],
+    'deny': []
+  },
+  {
+    'principal': 'role:feature-toggle.admin',
+    'allow': [
+      'READ',
+      'CREATE',
+      'MODIFY',
+      'DELETE',
+      'PUBLISH',
+      'READ_PERMISSIONS',
+      'WRITE_PERMISSIONS'
+    ],
+    'deny': []
+  },
+  {
+    'principal': 'role:feature.toggle.viewer',
+    'allow': [
+      'READ',
+    ],
+    'deny': [
+      'CREATE',
+      'MODIFY',
+      'DELETE',
+      'PUBLISH',
+      'READ_PERMISSIONS',
+      'WRITE_PERMISSIONS'
+    ]
+  },
+  {
+    'principal': 'role:system.everyone',
+    'allow': [
+      'READ',
+      'READ_PERMISSIONS',
+    ],
+    'deny': [
+      'CREATE',
+      'MODIFY',
+      'DELETE',
+      'PUBLISH',
+      'WRITE_PERMISSIONS'
+    ]
+  },
+  {
+    'principal': 'user:system:anonymous',
+    'allow': [
+      'READ',
+      'READ_PERMISSIONS',
+    ],
+    'deny': [
+      'CREATE',
+      'MODIFY',
+      'DELETE',
+      'PUBLISH',
+      'WRITE_PERMISSIONS'
+    ]
+  }
+]
+
 const getRepo = function() {
   return repoLib.get(FEATURE_TOGGLE_REPO)
 }
@@ -13,62 +84,8 @@ const getRepo = function() {
 const createRepo = function() {
   return repoLib.create({
     id: FEATURE_TOGGLE_REPO,
-    rootPermissions: [
-      {
-        'principal': 'role:system.admin',
-        'allow': [
-          'READ',
-          'CREATE',
-          'MODIFY',
-          'DELETE',
-          'PUBLISH',
-          'READ_PERMISSIONS',
-          'WRITE_PERMISSIONS'
-        ],
-        'deny': []
-      },
-      {
-        'principal': 'role:feature-toggle.admin',
-        'allow': [
-          'READ',
-          'CREATE',
-          'MODIFY',
-          'DELETE',
-          'PUBLISH',
-          'READ_PERMISSIONS',
-          'WRITE_PERMISSIONS'
-        ],
-        'deny': []
-      },
-      {
-        'principal': 'role:feature.toggle.viewer',
-        'allow': [
-          'READ',
-        ],
-        'deny': [
-          'CREATE',
-          'MODIFY',
-          'DELETE',
-          'PUBLISH',
-          'READ_PERMISSIONS',
-          'WRITE_PERMISSIONS'
-        ]
-      },
-      {
-        'principal': 'role:system.everyone',
-        'allow': [
-          'READ',
-        ],
-        'deny': [
-          'CREATE',
-          'MODIFY',
-          'DELETE',
-          'PUBLISH',
-          'READ_PERMISSIONS',
-          'WRITE_PERMISSIONS'
-        ]
-      }
-    ]
+    rootPermissions: PERMISSIONS,
+    _inheritsPermissions: true
   })
 }
 
@@ -81,16 +98,18 @@ const createBranch = function(branch) {
 
 exports.connect = function(branch) {
   const context = contextLib.get()
-  let repo = getRepo()
-  if(!repo) {
-    repo = createRepo()
-  }
-
-  if(repo.branches.filter(b => b === FEATURE_TOGGLE_MASTER).length === 0) {
-    createBranch(FEATURE_TOGGLE_MASTER)
-  }
-  if(repo.branches.filter(b => b === FEATURE_TOGGLE_DRAFT).length === 0) {
-    createBranch(FEATURE_TOGGLE_DRAFT)
+  if(context.branch === FEATURE_TOGGLE_DRAFT) {
+    let repo = getRepo()
+    if(!repo) {
+      repo = createRepo()
+    }
+  
+    if(repo.branches.filter(b => b === FEATURE_TOGGLE_MASTER).length === 0) {
+      createBranch(FEATURE_TOGGLE_MASTER)
+    }
+    if(repo.branches.filter(b => b === FEATURE_TOGGLE_DRAFT).length === 0) {
+      createBranch(FEATURE_TOGGLE_DRAFT)
+    }
   }
 
   return nodeLib.connect({
