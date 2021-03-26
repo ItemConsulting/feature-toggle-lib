@@ -2,20 +2,13 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'com.enonic.xp.base' version '2.0.0'
+    id "com.vanniktech.maven.publish" version "0.13.0"
 }
 
 repositories {
     mavenLocal()
     jcenter()
     xp.enonicRepo()
-}
-
-publishing {
-    publications {
-        myLibrary(MavenPublication) {
-            from components.java
-        }
-    }
 }
 
 dependencies {
