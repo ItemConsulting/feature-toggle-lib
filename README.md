@@ -22,7 +22,7 @@ include "com.gravitondigital:featuretogglelib:0.1.0"
 
 ## Functions
 ```javascript
-const featureToggleLib = require('/lib/featureToggle)
+const featureToggleLib = require('/lib/featureToggle')
 ```
 ### isEnabled
 Checks if the feature is enabled for the current space. Where the space is the site you're running in, or the name of the app if it's not running in the context of a site
