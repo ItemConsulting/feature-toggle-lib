@@ -27,24 +27,35 @@ exports.isEnabled = function (featureKey, defaultValue = false) {
     if (feature) {
       return feature.data.enabled;
     }
-  
+
     if (context.branch === 'draft') {
       create({
-        key: featureKey,
         space: space,
-        enabled: defaultValue,
+        features: [
+          {
+            feature: featureKey,
+            enabled: defaultValue,
+          },
+        ],
       });
     }
     return defaultValue;
-  } catch(e) {
-    return defaultValue
+  } catch (e) {
+    return defaultValue;
   }
-
 };
 
 /**
+ * @typedef {{feature: string, enabled: boolean}} FeatureCreate
+ */
+
+/**
+ * @typedef {{space: string, features: Array<FeatureCreate>}} SpaceCreate
+ */
+
+/**
  * @description Create features
- * @param {Array<{space: string, key: string, enabled: boolean}> | {space: string, key: string, enabled: boolean}} options
+ * @param {Array<SpaceCreate> | SpaceCreate} options
  */
 function create(options) {
   if (options) {
@@ -53,26 +64,28 @@ function create(options) {
     }
     node.runAsAdmin(() => {
       const connection = node.connect('draft');
-      options.forEach((feature) => {
-        const spaceNode = connection.get(`/${feature.space}`);
+      options.forEach((/**@type {SpaceCreate} */ spaceOptions) => {
+        const spaceNode = connection.get(`/${spaceOptions.space}`);
         if (!spaceNode) {
           connection.create({
-            _name: feature.space,
+            _name: spaceOptions.space,
             _parentPath: '/',
             _inheritsPermissions: true,
           });
         }
-        const featureNode = connection.get(`/${feature.space}/${feature.key}`);
-        if (!featureNode) {
-          connection.create({
-            _name: feature.key,
-            _parentPath: `/${feature.space}`,
-            _inheritsPermissions: true,
-            data: {
-              enabled: !!feature.enabled,
-            },
-          });
-        }
+        spaceOptions.features.forEach((featuresOptions) => {
+          const featureNode = connection.get(`/${spaceOptions.space}/${featuresOptions.feature}`);
+          if (!featureNode) {
+            connection.create({
+              _name: featuresOptions.feature,
+              _parentPath: `/${spaceOptions.space}`,
+              _inheritsPermissions: true,
+              data: {
+                enabled: !!featuresOptions.enabled,
+              },
+            });
+          }
+        });
       });
     });
   }
@@ -135,10 +148,10 @@ function publishFeature(options) {
         key: repoFeature._id,
         target: 'master',
       });
-      return res.failed.length === 0
+      return res.failed.length === 0;
     });
   }
-  return false
+  return false;
 }
 
 exports.publishFeature = publishFeature;
