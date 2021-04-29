@@ -5,6 +5,7 @@ It's higly recommended to install the companion application, [Feature Toggle App
 | Version       | XP Version            | Download  | App Version |
 | ------------- |:-------------:| -----:| :-----:|
 | 0.1.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.1.0/featuretogglelib-0.1.0.jar)     | [0.1.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.1.0/featuretoggleapp-0.1.0.jar)
+| 0.2.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.2.0/featuretogglelib-0.2.0.jar)     | [0.1.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.1.0/featuretoggleapp-0.1.0.jar)
 
 ## Add to your project
 
@@ -48,20 +49,36 @@ This will not update features that already exists, for that you'll have to use `
 // one
 create({
   space: 'my-site-or-application-name',
-  key: 'my-feature',
-  enabled: true|false
+  features: [
+    {
+      feature: 'my-feature',
+      enabled: true|false
+    }
+  ]
 })
 // multiple
 create([
   {
     space: 'my-site-or-application-name',
-    key: 'my-feature',
-    enabled: true|false
-  }, 
+    features: [
+      {
+        feature: 'my-feature',
+        enabled: true|false
+      },
+      {
+        feature: 'my-second-feature',
+        enabled: true|false
+      }
+    ]
+  },
   {
-    space: 'my-site-or-application-name',
-    key: 'my-second-feature',
-    enabled: true|false
+    space: 'my-second-site-or-application-name',
+    features: [
+      {
+        feature: 'my-other-feature',
+        enabled: true|false
+      }
+    ]
   }
 ])
 ```
