@@ -18,7 +18,7 @@ maven {
 
 And this dependency
 ```groovy
-include "com.gravitondigital:featuretogglelib:0.1.0"
+include "com.gravitondigital:featuretogglelib:0.2.0"
 ```
 
 ## Functions
