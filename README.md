@@ -5,7 +5,8 @@ It's higly recommended to install the companion application, [Feature Toggle App
 | Version       | XP Version            | Download  | App Version |
 | ------------- |:-------------:| -----:| :-----:|
 | 0.1.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.1.0/featuretogglelib-0.1.0.jar)     | [0.1.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.1.0/featuretoggleapp-0.1.0.jar)
-| 0.2.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.2.0/featuretogglelib-0.2.0.jar)     | [0.1.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.1.0/featuretoggleapp-0.1.0.jar)
+| 0.2.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.2.0/featuretogglelib-0.2.0.jar)     | [0.2.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.2.0/featuretoggleapp-0.2.0.jar)
+| 0.3.0         | >= 7.0.0      | [Download](https://repo1.maven.org/maven2/com/gravitondigital/featuretogglelib/0.3.0/featuretogglelib-0.3.0.jar)     | [0.3.0](https://repo1.maven.org/maven2/com/gravitondigital/featuretoggleapp/0.3.0/featuretoggleapp-0.3.0.jar)
 
 ## Add to your project
 
@@ -18,7 +19,7 @@ maven {
 
 And this dependency
 ```groovy
-include "com.gravitondigital:featuretogglelib:0.2.0"
+include "com.gravitondigital:featuretogglelib:0.3.0"
 ```
 
 ## Functions
