@@ -35,6 +35,8 @@ Checks if the feature is enabled for the current space. Where the space is the s
 const isMyFeatureEnabled = isEnabled('my-feature')
 // optional second param that is the default value of the feature, defaults to false if not passed
 const mySecondFeature = isEnabled('my-second-feature', true)
+// optional third param to override automatic space
+const myThirdFeature = isEnabled('my-third-feature', undefined | true | false , 'override-space')
 ```
 
 
