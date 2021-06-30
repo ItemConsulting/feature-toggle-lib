@@ -99,16 +99,20 @@ const createBranch = function(branch) {
 exports.connect = function(branch) {
   const context = contextLib.get()
   if(context.branch === FEATURE_TOGGLE_DRAFT) {
-    let repo = getRepo()
-    if(!repo) {
-      repo = createRepo()
-    }
-  
-    if(repo.branches.filter(b => b === FEATURE_TOGGLE_MASTER).length === 0) {
-      createBranch(FEATURE_TOGGLE_MASTER)
-    }
-    if(repo.branches.filter(b => b === FEATURE_TOGGLE_DRAFT).length === 0) {
-      createBranch(FEATURE_TOGGLE_DRAFT)
+    try {
+      let repo = getRepo()
+      if(!repo) {
+        repo = createRepo()
+      }
+    
+      if(repo.branches.filter(b => b === FEATURE_TOGGLE_MASTER).length === 0) {
+        createBranch(FEATURE_TOGGLE_MASTER)
+      }
+      if(repo.branches.filter(b => b === FEATURE_TOGGLE_DRAFT).length === 0) {
+        createBranch(FEATURE_TOGGLE_DRAFT)
+      }
+    } catch(e) {
+      // try to connect anyway
     }
   }
 
