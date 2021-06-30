@@ -18,11 +18,13 @@ function getKey() {
   return app.name;
 }
 
-exports.isEnabled = function (featureKey, defaultValue = false) {
-  try {
+exports.isEnabled = function (featureKey, defaultValue = false, space = undefined) {
+    try {
     const context = contextLib.get();
     const connection = node.connect();
-    const space = getKey();
+    if(!space) {
+      space = getKey()
+    }
     const feature = connection.get(`/${space}/${featureKey}`);
     if (feature) {
       return feature.data.enabled;
