@@ -6,8 +6,7 @@ feature toggles in Enonic XP.
 [![](https://repo.itemtest.no/api/badge/latest/releases/no/item/lib-xp-feature-toggle)](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggle)
 
 > [!TIP]
-> We recommend that you use the [Feature Toggle App](https://github.com/ItemConsulting/feature-toggle-app) to toggle
-> feature flags instead of using this library to do it programmatically.
+> We recommend that you use the "Feature Toggle" App to toggle feature flags instead of using this library to do it programmatically.
 
 ## Installation
 
@@ -34,7 +33,7 @@ dependencies {
 | 0.2.0   |  >= 7.0.0  | [Maven Central](https://central.sonatype.com/artifact/com.gravitondigital/featuretogglelib/0.2.0) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle) 
 | 0.1.0   |  >= 7.0.0  | [Maven Central](https://central.sonatype.com/artifact/com.gravitondigital/featuretogglelib/0.1.0) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle)
 
-### Usage
+## Usage
 
 ### `isEnabled`
 
