@@ -1,0 +1,41 @@
+{
+  "name": "@item-enonic-types/lib-feature-toggle",
+  "version": "0.4.0",
+  "description": "Type definitions for lib-sentry",
+  "license": "MIT",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@changesets/cli": "^2.27.11",
+    "@enonic-types/core": "^7.14.4",
+    "@enonic-types/global": "^7.14.4",
+    "@enonic-types/lib-context": "^7.14.4",
+    "@enonic-types/lib-node": "^7.14.4",
+    "@enonic-types/lib-portal": "^7.14.4",
+    "@enonic-types/lib-repo": "^7.14.4",
+    "@swc/core": "^1.10.7",
+    "@types/node": "^22.10.5",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.19.1"
+  },
+  "scripts": {
+    "build": "node tsup/anyServerFiles.js && npx tsup -d build/resources/main",
+    "check": "concurrently -c auto -g --timings npm:check:types npm:lint",
+    "check:types": "node tsup/anyServerFiles.js && npx tsc --noEmit -p src/main/resources/tsconfig.json || exit 0",
+    "lint": "eslint --cache \"src/main/resources/**/*.ts\"",
+    "prepublishOnly": "tsc --project src/main/resources/tsconfig.json --declarationDir build/types --emitDeclarationOnly true --declaration true && mkdir -p ./dist && cp -r ./build/types/lib/featureToggle/* ./dist",
+    "postpublish": "rm -r ./dist",
+    "release": "npm run build",
+    "versioning": "npx changeset version && npm i --package-lock-only && NEW_VERSION=$(node -p \"require('./package.json').version\") && sed -i \"s/version.*/version = ${NEW_VERSION}/\" gradle.properties"
+  }
+}

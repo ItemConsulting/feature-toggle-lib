@@ -1,0 +1,18 @@
+{
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "src/**/*.*", // Avoid Enonic XP source files
+  ],
+
+  "compilerOptions": {
+    "lib": [
+      "es2023" // string.replaceAll
+    ],
+    "types": [
+      "node"
+    ],
+  },
+}
