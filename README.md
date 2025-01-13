@@ -24,6 +24,26 @@ dependencies {
 }
 ```
 
+### TypeScript
+
+Install the TypeScript-types with the following command:
+
+```bash
+npm install --save-dev @item-enonic-types/lib-features-toggles
+```
+
+By adding the following changes to your *tsconfig.json* you will get TypeScript-support for this library.
+
+```diff
+{
+  "compilerOptions": {
+    "paths": {
++     "/lib/featureToggle": ["../../../node_modules/@item-enonic-types/lib-feature-toggles"],
+    }
+  }
+}
+```
+
 ## Compatibility
 
 | Version | XP Version |                                                                                        Repository |                         App Version                          |
@@ -138,7 +158,7 @@ publishFeature({
 
 ### Building
 
-To build he project run the following code
+To build the project run the following code
 
 ```bash
 ./gradlew build

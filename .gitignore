@@ -98,3 +98,4 @@ crashlytics-build.properties
 
 .eslintcache
 dist
+*.tgz
