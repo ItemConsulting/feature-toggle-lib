@@ -18,6 +18,7 @@
     "@enonic-types/lib-node": "^7.14.4",
     "@enonic-types/lib-portal": "^7.14.4",
     "@enonic-types/lib-repo": "^7.14.4",
+    "@itemconsulting/xp-storybook-utils": "^0.0.7",
     "@swc/core": "^1.10.14",
     "@types/node": "^22.13.1",
     "concurrently": "^9.1.2",
@@ -34,7 +35,7 @@
     "check": "concurrently -c auto -g --timings npm:check:types npm:lint",
     "check:types": "node tsup/anyServerFiles.js && npx tsc --noEmit -p src/main/resources/tsconfig.json || exit 0",
     "lint": "eslint --cache \"src/main/resources/**/*.ts\"",
-    "prepublish:types": "tsc --declaration true --emitDeclarationOnly true --declarationDir build/types && cp -r build/types/src/main/resources/site dist",
+    "prepublishOnly": "tsc -p src/main/resources/tsconfig.json --declaration true --emitDeclarationOnly true --declarationDir dist",
     "postpublish": "rm -r ./dist",
     "release": "npm run build",
     "versioning": "npx changeset version && npm i --package-lock-only && NEW_VERSION=$(node -p \"require('./package.json').version\") && sed -i \"s/version.*/version = ${NEW_VERSION}/\" gradle.properties"
