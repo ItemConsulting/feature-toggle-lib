@@ -8,6 +8,7 @@
   ],
 
   "compilerOptions": {
+    "strict": true,
     "paths": {
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
       "/*": ["./*"],

@@ -1,6 +1,6 @@
-# Feature Toggle Lib
+# Feature Toggles Lib
 
-Library for interacting with the [Feature Toggle App](https://github.com/ItemConsulting/feature-toggle-app) to use
+Library for interacting with the [Feature Toggles App](https://github.com/ItemConsulting/xp-feature-toggles) to use
 feature toggles in Enonic XP.
 
 [![](https://repo.itemtest.no/api/badge/latest/releases/no/item/lib-xp-feature-toggle)](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggle)
@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-  include "no.item:lib-xp-feature-toggle:0.4.0"
+  include "no.item:lib-xp-feature-toggles:1.0.0"
 }
 ```
 
@@ -38,93 +38,82 @@ By adding the following changes to your *tsconfig.json* you will get TypeScript-
 {
   "compilerOptions": {
     "paths": {
-+     "/lib/featureToggle": ["../../../node_modules/@item-enonic-types/lib-feature-toggles"],
++     "/lib/feature-toggles": ["../../../node_modules/@item-enonic-types/lib-feature-toggles"],
     }
   }
 }
 ```
 
-## Compatibility
-
-| Version | XP Version |                                                                                        Repository |                         App Version                          |
-|---------|:----------:|--------------------------------------------------------------------------------------------------:|:------------------------------------------------------------:|
-| 0.4.0   | >= 7.12.0  |               [Itemtest](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggle/0.0.4) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle) 
-| 0.3.0   |  >= 7.0.0  | [Maven Central](https://central.sonatype.com/artifact/com.gravitondigital/featuretogglelib/0.3.0) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle) 
-| 0.2.0   |  >= 7.0.0  | [Maven Central](https://central.sonatype.com/artifact/com.gravitondigital/featuretogglelib/0.2.0) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle) 
-| 0.1.0   |  >= 7.0.0  | [Maven Central](https://central.sonatype.com/artifact/com.gravitondigital/featuretogglelib/0.1.0) | [0.1.0](https://github.com/ItemConsulting/xp-feature-toggle)
-
 ## Usage
 
 ### `isEnabled`
 
-Checks if the feature is enabled for the current space. Where the space is the site you're running in, or the name of 
-the app if it's not running in the context of a site.
+Checks if the feature is enabled for the current space. Where the space by default is your apps name. You can also name
+your own spaces if you want to configure it per site.
 
 `isEnabled` will automatically create the space and the feature with a default value if it's called in a `draft` context.
 
 ```typescript
-import { isEnabled } from '/lib/featureToggle';
+import { isEnabled } from "/lib/feature-toggles";
 
-// returns true or false
-const isMyFeatureEnabled = isEnabled('my-feature');
+const isMyFeatureEnabled1: boolean = isEnabled({
+  featureKey: "my-feature",
+  defaultValue: false,
+  spaceKey: app.name,
+});
 
-// optional second param that is the default value of the feature, defaults to false if not passed
-const mySecondFeature = isEnabled('my-second-feature', true);
-
-// optional third param to override automatic space
-const myThirdFeature = isEnabled('my-third-feature', undefined | true | false , 'override-space');
+// This shorthand will yield the the same result as the example above
+const isMyFeatureEnabled2: boolean = isEnabled("my-feature");
 ```
 
 ### `create`
 
-Creates spaces and features for your app. This should usually be run from your main.js file, to initalize spaces and 
-features you're going use. Spaces and features will automatically be created by the `isEnabled` function, but if you're 
+Creates spaces and features for your app. This should usually be run from your main.js file, to initialize spaces and 
+features you're going use. Spaces and features will automatically be created by the `isEnabled()` function, but if you're 
 using the companion app for this library, they won't show up there until someone hits that part of your code.
 
-This will only create the spaces and features for `draft` contexts, and not `master`,  you'll have to use the companion 
-app or `publishFeature` for that.
+This will only create the spaces and features for `"draft"` contexts, and not `"master"`,  you'll have to use the companion 
+app or `publishFeature()` for that.
 
-This will not update features that already exists, for that you'll have to use `update`.
+This will not update features that already exists, for that you'll have to use `update()`.
 
 ```typescript
-import { create } from '/lib/featureToggle';
+import { create } from "/lib/feature-toggles";
 
-// single
+// Create a single new feature flag
 create({
-  space: 'my-site-or-application-name',
-  features: [
-    {
-      feature: 'my-feature',
-      enabled: true|false
-    }
-  ]
+  name: "my-feature",
+  enabled: true,
 });
 
-// multiple
+// Create multiple new feature flags
 create([
   {
-    space: 'my-site-or-application-name',
-    features: [
-      {
-        feature: 'my-feature',
-        enabled: true|false
-      },
-      {
-        feature: 'my-second-feature',
-        enabled: true|false
-      }
-    ]
+    name: "my-feature",
+    enabled: false,
   },
   {
-    space: 'my-second-site-or-application-name',
-    features: [
-      {
-        feature: 'my-other-feature',
-        enabled: true|false
-      }
-    ]
+    name: "my-second-feature",
+    enabled: true,
   }
 ]);
+
+// Create feature flags in a different "space"
+const siteBasedSpaceKey = getSite()._name;
+
+create(
+  [
+    {
+      name: "my-feature",
+      enabled: false,
+    },
+    {
+      name: "my-second-feature",
+      enabled: true,
+    },
+  ],
+  siteBasedSpaceKey,
+);
 ```
 
 ### `update`
@@ -132,13 +121,24 @@ create([
 Enable/Disable a feature in draft
 
 ```typescript
-import { update } from '/lib/featureToggle';
+import { update } from "/lib/feature-toggles";
 
+// Enable the feature "my-feature" in the application space
 update({
-  space: 'my-site-or-application-name',
-  feature: 'my-feature',
-  enabled: true|false
+  name: "my-feature",
+  enabled: true
 });
+
+// Disable the feature "my-feature" in a space based on the current site
+const siteBasedSpaceKey = getSite()._name;
+
+update(
+  {
+    name: "my-feature",
+    enabled: false,
+  },
+  siteBasedSpaceKey,
+);
 ```
 
 ### `publishFeature`
@@ -146,12 +146,16 @@ update({
 Publishes feature from draft to master
 
 ```typescript
-import { publishFeature } from '/lib/featureToggle';
+import { publishFeature } from "/lib/feature-toggles";
 
-publishFeature({
-  space: 'my-site-or-application-name',
-  feature: 'my-feature'
-});
+// Publish a feature to go live on your site
+publishFeature("my-feature");
+
+// Publish to a different space then `app.name`
+const siteBasedSpaceKey = getSite()._name;
+
+publishFeature("my-feature", siteBasedSpaceKey)
+
 ```
 
 ## Deploying
