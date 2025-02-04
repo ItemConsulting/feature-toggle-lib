@@ -15,6 +15,7 @@ export type FeatureNode = {
   data: {
     enabled: boolean;
     value: unknown;
+    description?: string;
   };
 };
 

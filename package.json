@@ -1,6 +1,6 @@
 {
   "name": "@item-enonic-types/lib-feature-toggles",
-  "version": "0.5.0-SNAPSHOT",
+  "version": "0.5.0-SNAPSHOT6",
   "description": "Type definitions for lib-feature-toggles",
   "license": "MIT",
   "private": false,
@@ -14,6 +14,7 @@
     "@changesets/cli": "^2.27.12",
     "@enonic-types/core": "^7.14.4",
     "@enonic-types/global": "^7.14.4",
+    "@enonic-types/lib-auth": "^7.14.4",
     "@enonic-types/lib-context": "^7.14.4",
     "@enonic-types/lib-node": "^7.14.4",
     "@enonic-types/lib-portal": "^7.14.4",
