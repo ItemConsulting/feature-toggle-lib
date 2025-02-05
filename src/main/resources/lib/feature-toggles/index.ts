@@ -73,6 +73,7 @@ export function create(features: FeatureConfig[] | FeatureConfig, spaceKey: stri
       _name: spaceKey,
       _parentPath: "/",
       _inheritsPermissions: true,
+      _childOrder: "_name ASC",
     });
 
     log.info(`Created new space ${spaceKey}`);
@@ -119,14 +120,16 @@ export function update(
     editor: (repoNode) => {
       repoNode.data = {
         ...repoNode.data,
-        enabled: feature.enabled,
-        value: feature.value,
-        description: feature.description,
+        enabled: feature.enabled ?? repoNode.data.enabled,
+        value: feature.value ?? repoNode.data.value,
+        description: feature.description ?? repoNode.data.description,
       };
 
       return repoNode;
     },
   });
+
+  connection.refresh("ALL");
 
   return nodeToFeature(res);
 }

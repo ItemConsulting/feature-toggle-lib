@@ -35,6 +35,7 @@ export function getChildren<NodeData = Record<string, unknown>>(
 
   return connection
     .findChildren({
+      childOrder: "_name ASC",
       count: -1,
       ...params,
     })
