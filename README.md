@@ -1,12 +1,18 @@
 # Feature Toggles Lib
 
-Library for interacting with the [Feature Toggles App](https://github.com/ItemConsulting/xp-feature-toggles) to use
-feature toggles in Enonic XP.
+Library for creating _Feature Toggles_, and checking if they have been enabled/disabled by the 
+[Feature Toggles App](https://github.com/ItemConsulting/xp-feature-toggles). A _feature toggle_ is is a boolean flag
+that can be used in your application to enable/disable functionality.
+
+Common usages of feature toggles are:
+- Merging partially implemented features into your codebase, but not exposing them to the end users
+- A feature switch (kill switch?) that can be used by the admins/editors
+- Enable a feature on the `"draft"` branch, but not on `"master"`.
 
 [![](https://repo.itemtest.no/api/badge/latest/releases/no/item/lib-xp-feature-toggle)](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggle)
 
 > [!TIP]
-> We recommend that you use the "Feature Toggle" App to toggle feature flags instead of using this library to do it programmatically.
+> We recommend that you use the _Feature Toggle App_ to toggle feature flags instead of using this library to do it programmatically.
 
 ## Installation
 
@@ -46,7 +52,7 @@ By adding the following changes to your *tsconfig.json* you will get TypeScript-
 
 ## Usage
 
-### `isEnabled`
+### `isEnabled()`
 
 Checks if the feature is enabled for the current space. Where the space by default is your apps name. You can also name
 your own spaces if you want to configure it per site.
@@ -66,7 +72,7 @@ const isMyFeatureEnabled1: boolean = isEnabled({
 const isMyFeatureEnabled2: boolean = isEnabled("my-feature");
 ```
 
-### `create`
+### `create()`
 
 Creates spaces and features for your app. This should usually be run from your main.js file, to initialize spaces and 
 features you're going use. Spaces and features will automatically be created by the `isEnabled()` function, but if you're 
@@ -117,7 +123,7 @@ create(
 );
 ```
 
-### `update`
+### `update()`
 
 Enable/Disable a feature in draft
 
@@ -142,9 +148,9 @@ update(
 );
 ```
 
-### `publishFeature`
+### `publish()`
 
-Publishes feature from draft to master
+Publishes feature from `"draft"` to `"master"`.
 
 ```typescript
 import { publish } from "/lib/feature-toggles";
