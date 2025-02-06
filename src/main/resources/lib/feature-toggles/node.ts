@@ -3,6 +3,7 @@ import {
   ConnectParams as XPConnectParams,
   FindChildrenParams,
   type Node,
+  type QueryNodeParams,
   type RepoConnection,
 } from "/lib/xp/node";
 import { get as getContext } from "/lib/xp/context";
@@ -16,20 +17,17 @@ export type FeatureNode = {
     enabled: boolean;
     value: unknown;
     description?: string;
+    spaceKey: string;
   };
 };
 
-export function getSpaceNode(spaceKey?: string): Node | null {
-  const connection = connect({
-    branch: "draft",
-  });
-
-  return connection.get(`/${spaceKey ?? app.name}`);
-}
+export type SpaceNode = {
+  type: "no.item.feature-toggles:space";
+};
 
 export function getChildren<NodeData = Record<string, unknown>>(
   params: FindChildrenParams,
-  branch = "draft",
+  branch?: string,
 ): Node<NodeData>[] {
   const connection = connect({ branch });
 
@@ -43,14 +41,25 @@ export function getChildren<NodeData = Record<string, unknown>>(
     .filter((node) => node !== null);
 }
 
+export function query<NodeData = Record<string, unknown>>(params: QueryNodeParams, branch?: string): Node<NodeData>[] {
+  const connection = connect({ branch });
+
+  return connection
+    .query({
+      count: -1,
+      sort: "_name ASC",
+      ...params,
+    })
+    .hits.map((space) => connection.get<NodeData>(space.id))
+    .filter((node) => node !== null);
+}
+
 export type ConnectParams = Partial<Omit<XPConnectParams, "repoId">>;
 
 export function connect(params: ConnectParams = {}): RepoConnection {
-  const context = getContext();
-
   return nodeConnect({
     ...params,
     repoId: REPO_NAME,
-    branch: params.branch ?? context.branch ?? "draft",
+    branch: params.branch ?? getContext().branch ?? "draft",
   });
 }

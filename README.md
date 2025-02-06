@@ -80,13 +80,13 @@ This will not update features that already exists, for that you'll have to use `
 ```typescript
 import { create } from "/lib/feature-toggles";
 
-// Create a single new feature flag
+// Create a single new feature flag in the default space (`app.name`)
 create({
   name: "my-feature",
   enabled: true,
 });
 
-// Create multiple new feature flags
+// Create multiple new feature flags in the default space (`app.name`)
 create([
   {
     name: "my-feature",
@@ -95,7 +95,7 @@ create([
   {
     name: "my-second-feature",
     enabled: true,
-  }
+  },
 ]);
 
 // Create feature flags in a different "space"
@@ -106,13 +106,14 @@ create(
     {
       name: "my-feature",
       enabled: false,
+      spaceKey: siteBasedSpaceKey,
     },
     {
       name: "my-second-feature",
       enabled: true,
+      spaceKey: siteBasedSpaceKey,
     },
   ],
-  siteBasedSpaceKey,
 );
 ```
 
@@ -123,7 +124,7 @@ Enable/Disable a feature in draft
 ```typescript
 import { update } from "/lib/feature-toggles";
 
-// Enable the feature "my-feature" in the application space
+// Enable the feature "my-feature" in the default space (`app.name`)
 update({
   name: "my-feature",
   enabled: true
@@ -136,8 +137,8 @@ update(
   {
     name: "my-feature",
     enabled: false,
+    spaceKey: siteBasedSpaceKey,
   },
-  siteBasedSpaceKey,
 );
 ```
 
@@ -146,15 +147,24 @@ update(
 Publishes feature from draft to master
 
 ```typescript
-import { publishFeature } from "/lib/feature-toggles";
+import { publish } from "/lib/feature-toggles";
 
-// Publish a feature to go live on your site
-publishFeature("my-feature");
+// Publish a feature with a given `id` to go live on your site
+publish("9800b7a6-ebe6-4332-ac24-c70cd7ecf596");
+
+// Publish a feature in the default space to go live
+publish({
+  featureKey: "my-feature",
+  spaceKey: app.name,
+})
 
 // Publish to a different space then `app.name`
 const siteBasedSpaceKey = getSite()._name;
 
-publishFeature("my-feature", siteBasedSpaceKey)
+publish({
+  featureKey: "my-feature",
+  spaceKey: siteBasedSpaceKey
+})
 
 ```
 

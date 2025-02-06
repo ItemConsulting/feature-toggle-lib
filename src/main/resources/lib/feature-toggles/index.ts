@@ -1,8 +1,10 @@
 import { get as getContext } from "/lib/xp/context";
-import { connect, getChildren, type FeatureNode } from "./node";
-import { forceArray } from "./utils";
+import { connect, getChildren, query, type FeatureNode, type SpaceNode } from "./node";
+import { forceArray, notNullOrUndefined, unique, type Optional } from "./utils";
 export { initRepo, PRINCIPAL_KEY_ADMIN, PRINCIPAL_KEY_VIEWER } from "./repo";
 import type { Node } from "/lib/xp/node";
+
+type Branch = "draft" | "master";
 
 export type FeatureNodePath = `/${string}/${string}`;
 export type FeatureNodeKey = {
@@ -10,15 +12,13 @@ export type FeatureNodeKey = {
   featureKey: string;
 };
 
-export type FeatureConfig = {
+export type Feature = {
+  id: string;
   name: string;
   enabled: boolean;
   description?: string;
+  spaceKey: string;
   value?: unknown;
-};
-
-export type Feature = FeatureConfig & {
-  id: string;
   createdDate: string;
 };
 
@@ -26,12 +26,23 @@ export type IsEnabledParams = {
   featureKey: string;
   spaceKey?: string;
   defaultValue?: boolean;
-  branch?: "draft" | "master";
+  branch?: Branch;
 };
 
+/**
+ * Returns true if the specified feature is enabled, or the default value if not found.
+ *
+ * @param {string} featureKey
+ * @returns {boolean}
+ */
 export function isEnabled(featureKey: string): boolean;
+/**
+ * @overload
+ * @param {IsEnabledParams} params
+ * @returns {boolean}
+ */
 export function isEnabled(params: IsEnabledParams): boolean;
-export function isEnabled(params: string | IsEnabledParams): boolean;
+export function isEnabled(params: string): boolean;
 export function isEnabled(params: string | IsEnabledParams): boolean {
   const contextBranch = getContext().branch;
   const spaceKey = typeof params === "string" ? app.name : (params.spaceKey ?? app.name);
@@ -40,19 +51,19 @@ export function isEnabled(params: string | IsEnabledParams): boolean {
   const branch = typeof params === "string" ? contextBranch : (params.branch ?? contextBranch);
 
   try {
-    const feature = connect().get<FeatureNode>(getFeatureNodePath({ featureKey, spaceKey }));
+    const feature = connect({
+      branch,
+    }).get<FeatureNode>(getFeatureNodePath({ featureKey, spaceKey }));
 
     if (feature) {
       return feature.data.enabled ?? defaultValue;
     } else if (branch === "draft") {
       // If on draft, create the feature if it doesn't exist
-      create(
-        {
-          name: featureKey,
-          enabled: defaultValue,
-        },
+      create({
+        name: featureKey,
+        enabled: defaultValue,
         spaceKey,
-      );
+      });
     }
   } catch (e) {
     log.error(`Can't check feature toggle state for "${spaceKey}/${featureKey}"`, e);
@@ -61,48 +72,56 @@ export function isEnabled(params: string | IsEnabledParams): boolean {
   return defaultValue;
 }
 
-export function create(features: FeatureConfig[] | FeatureConfig, spaceKey: string = app.name): void {
+type CreateFeatureParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
+
+export function create(features: CreateFeatureParams[] | CreateFeatureParams): void {
   const connection = connect({
     branch: "draft",
   });
 
-  const spaceNode = connection.exists(`/${spaceKey}`);
+  const spaceKeys = unique(forceArray(features).map((feature) => feature.spaceKey ?? app.name));
 
-  if (!spaceNode) {
-    connection.create({
-      _name: spaceKey,
-      _parentPath: "/",
-      _inheritsPermissions: true,
-      _childOrder: "_name ASC",
+  spaceKeys
+    .filter((spaceKey) => !connection.exists(`/${spaceKey}`))
+    .map((spaceKey) => {
+      connection.create<SpaceNode>({
+        _name: spaceKey,
+        _parentPath: "/",
+        _inheritsPermissions: true,
+        _childOrder: "_name ASC",
+        type: "no.item.feature-toggles:space",
+      });
+
+      log.info(`Created new space ${spaceKey}`);
     });
 
-    log.info(`Created new space ${spaceKey}`);
-  }
-
+  // Create features
   forceArray(features)
-    .filter((feature) => !connection.exists(`/${spaceKey}/${feature.name}`))
+    .filter((feature) => !connection.exists(`/${feature.spaceKey ?? app.name}/${feature.name}`))
     .forEach((feature) => {
-      connection.create({
+      connection.create<FeatureNode>({
         _name: feature.name,
-        _parentPath: `/${spaceKey}`,
+        _parentPath: `/${feature.spaceKey ?? app.name}`,
         _inheritsPermissions: true,
+        type: "no.item.feature-toggles:feature",
         data: {
           enabled: Boolean(feature.enabled),
           value: feature.value,
           description: feature.description,
+          spaceKey: feature.spaceKey ?? app.name,
         },
       });
 
-      log.info(`Created feature "${feature.name}" in space "${spaceKey}"`);
+      log.info(`Created feature "${feature.name}" in space "${feature.spaceKey ?? app.name}"`);
     });
 }
 
-export function update(feature: Omit<Feature, "name" | "createdDate">): Feature;
-export function update(feature: Omit<Feature, "id" | "createdDate">, spaceKey?: string): Feature;
-export function update(
-  feature: Omit<Feature, "name" | "createdDate"> | Omit<Feature, "id" | "createdDate">,
-  spaceKey: string = app.name,
-): Feature {
+type UpdateByIdParams = Omit<Optional<Feature, "spaceKey">, "name" | "createdDate">;
+type UpdateByFeatureNameParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
+
+export function update(feature: UpdateByIdParams): Feature;
+export function update(feature: UpdateByFeatureNameParams): Feature;
+export function update(feature: UpdateByIdParams | UpdateByFeatureNameParams): Feature {
   const connection = connect({
     branch: "draft",
   });
@@ -111,7 +130,7 @@ export function update(
     "id" in feature
       ? feature.id
       : getFeatureNodePath({
-          spaceKey: spaceKey,
+          spaceKey: feature.spaceKey ?? app.name,
           featureKey: feature.name,
         });
 
@@ -149,21 +168,47 @@ export function publish(idOrKey: string | FeatureNodeKey): boolean {
   return res.failed.length === 0;
 }
 
+/**
+ * Returns the nodes representing all spaces
+ */
 export function getSpaces(): Node[] {
   return getChildren({ parentKey: "/" });
 }
 
-export function getFeature(params: FeatureNodeKey | string, branch: string = "draft"): Feature | undefined {
+export function getFeature(params: FeatureNodeKey | string, branch?: Branch): Feature | undefined {
   const key = typeof params === "string" ? params : getFeatureNodePath(params);
   const node = connect({ branch }).get<FeatureNode>(key);
   return node ? nodeToFeature(node) : undefined;
 }
 
-export function getFeatures(spaceKey: string = app.name, branch: string = "draft"): Feature[] {
+/**
+ * Returns a list of features. If no `spaceKey` is provided it returns all features in all spaces.
+ *
+ * @param spaceKey Limit the results to the specified space.
+ * @param branch Which branch to retrieve features from.
+ */
+export function getFeatures(spaceKey?: string | string[], branch?: Branch): Feature[] {
   try {
-    return getChildren<FeatureNode>({ parentKey: `/${spaceKey}` }, branch).map(nodeToFeature);
+    return query<FeatureNode>(
+      {
+        filters: [
+          {
+            exists: {
+              field: "data.enabled",
+            },
+          },
+          {
+            hasValue: {
+              field: "data.spaceKey",
+              values: forceArray(spaceKey).filter(notNullOrUndefined),
+            },
+          },
+        ],
+      },
+      branch,
+    ).map(nodeToFeature);
   } catch (e) {
-    log.error(`Failed to get features for space ${spaceKey} in branch ${branch}`, e);
+    log.error(spaceKey ? `Failed to get features for space ${spaceKey}` : "Failed to list all features", e);
     return [];
   }
 }
@@ -178,6 +223,7 @@ function nodeToFeature(node: Node<FeatureNode>): Feature {
     name: node._name,
     enabled: Boolean(node.data.enabled),
     value: node.data.value,
+    spaceKey: node.data.spaceKey,
     description: node.data.description,
     createdDate: node._ts,
   };
