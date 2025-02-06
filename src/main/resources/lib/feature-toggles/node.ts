@@ -1,7 +1,7 @@
 import {
   connect as nodeConnect,
-  ConnectParams as XPConnectParams,
-  FindChildrenParams,
+  type ConnectParams as XPConnectParams,
+  type FindChildrenParams,
   type Node,
   type QueryNodeParams,
   type RepoConnection,

@@ -1,6 +1,6 @@
 import { create as createRepo, createBranch, get as getRepo, type Permission } from "/lib/xp/repo";
 import { includes } from "/lib/feature-toggles/utils";
-import { createRole, getPrincipal, RoleKey } from "/lib/xp/auth";
+import { createRole, getPrincipal, type RoleKey } from "/lib/xp/auth";
 import { REPO_NAME } from "/lib/feature-toggles/constants";
 
 const PERMISSIONS_READ: Permission[] = ["READ", "READ_PERMISSIONS"];
