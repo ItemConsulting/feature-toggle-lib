@@ -31,16 +31,8 @@ export type IsEnabledParams = {
 
 /**
  * Returns true if the specified feature is enabled, or the default value if not found.
- *
- * @param {string} featureKey
- * @returns {boolean}
  */
 export function isEnabled(featureKey: string): boolean;
-/**
- * @overload
- * @param {IsEnabledParams} params
- * @returns {boolean}
- */
 export function isEnabled(params: IsEnabledParams): boolean;
 export function isEnabled(params: string): boolean;
 export function isEnabled(params: string | IsEnabledParams): boolean {
@@ -74,6 +66,9 @@ export function isEnabled(params: string | IsEnabledParams): boolean {
 
 type CreateFeatureParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
 
+/**
+ * Create one or multiple new Features
+ */
 export function create(features: CreateFeatureParams[] | CreateFeatureParams): void {
   const connection = connect({
     branch: "draft",
@@ -83,7 +78,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
 
   spaceKeys
     .filter((spaceKey) => !connection.exists(`/${spaceKey}`))
-    .map((spaceKey) => {
+    .forEach((spaceKey) => {
       connection.create<SpaceNode>({
         _name: spaceKey,
         _parentPath: "/",
@@ -92,7 +87,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
         type: "no.item.feature-toggles:space",
       });
 
-      log.info(`Created new space ${spaceKey}`);
+      log.info(`Created new space "${spaceKey}"`);
     });
 
   // Create features
@@ -119,6 +114,9 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
 type UpdateByIdParams = Omit<Optional<Feature, "spaceKey">, "name" | "createdDate">;
 type UpdateByFeatureNameParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
 
+/**
+ * Update an existing Feature by ID or by Feature Name
+ */
 export function update(feature: UpdateByIdParams): Feature;
 export function update(feature: UpdateByFeatureNameParams): Feature;
 export function update(feature: UpdateByIdParams | UpdateByFeatureNameParams): Feature {
@@ -153,6 +151,9 @@ export function update(feature: UpdateByIdParams | UpdateByFeatureNameParams): F
   return nodeToFeature(res);
 }
 
+/**
+ * Publish changes to the master branch, and expose to "live" view
+ */
 export function publish(idOrKey: string | FeatureNodeKey): boolean {
   const connection = connect({
     branch: "draft",
@@ -175,6 +176,9 @@ export function getSpaces(): Node[] {
   return getChildren({ parentKey: "/" });
 }
 
+/**
+ * Returns a single Feature by `id` or `featureKey` + `spaceKey`.
+ */
 export function getFeature(params: FeatureNodeKey | string, branch?: Branch): Feature | undefined {
   const key = typeof params === "string" ? params : getFeatureNodePath(params);
   const node = connect({ branch }).get<FeatureNode>(key);
@@ -213,6 +217,9 @@ export function getFeatures(spaceKey?: string | string[], branch?: Branch): Feat
   }
 }
 
+/**
+ * Create the path of a node based on the provided `spaceKey` and `featureKey`.
+ */
 export function getFeatureNodePath({ spaceKey, featureKey }: FeatureNodeKey): FeatureNodePath {
   return `/${spaceKey}/${featureKey}`;
 }
