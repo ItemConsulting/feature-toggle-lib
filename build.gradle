@@ -12,6 +12,7 @@ dependencies {
   implementation "com.enonic.xp:lib-node:${xpVersion}"
   implementation "com.enonic.xp:lib-portal:${xpVersion}"
   implementation "com.enonic.xp:lib-repo:${xpVersion}"
+  implementation "no.item:lib-xp-time:1.2.0"
 }
 
 repositories {

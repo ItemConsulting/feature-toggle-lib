@@ -19,6 +19,7 @@
     "@enonic-types/lib-node": "^7.14.4",
     "@enonic-types/lib-portal": "^7.14.4",
     "@enonic-types/lib-repo": "^7.14.4",
+    "@item-enonic-types/lib-time": "^1.2.0",
     "@itemconsulting/xp-storybook-utils": "^0.0.7",
     "@swc/core": "^1.10.14",
     "@types/node": "^22.13.1",

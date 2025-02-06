@@ -13,6 +13,7 @@ export type { Node } from "/lib/xp/node";
 
 export type FeatureNode = {
   type: "no.item.feature-toggles:feature";
+  createdTime: string;
   data: {
     enabled: boolean;
     value: unknown;
@@ -23,6 +24,7 @@ export type FeatureNode = {
 
 export type SpaceNode = {
   type: "no.item.feature-toggles:space";
+  createdTime: string;
 };
 
 export function getChildren<NodeData = Record<string, unknown>>(

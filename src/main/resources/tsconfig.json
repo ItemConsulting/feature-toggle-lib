@@ -11,6 +11,7 @@
     "strict": true,
     "paths": {
       "/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
+      "/lib/*": ["./lib/*", "../../../node_modules/@item-enonic-types/lib-*"],
       "/*": ["./*"],
     },
     "skipLibCheck": true,

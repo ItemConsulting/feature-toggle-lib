@@ -2,6 +2,7 @@ import { get as getContext } from "/lib/xp/context";
 import { connect, getChildren, query, type FeatureNode, type SpaceNode } from "./node";
 import { forceArray, notNullOrUndefined, unique, type Optional } from "./utils";
 export { initRepo, PRINCIPAL_KEY_ADMIN, PRINCIPAL_KEY_VIEWER } from "./repo";
+import { Instant } from "/lib/time";
 import type { Node } from "/lib/xp/node";
 
 type Branch = "draft" | "master";
@@ -19,7 +20,7 @@ export type Feature = {
   description?: string;
   spaceKey: string;
   value?: unknown;
-  createdDate: string;
+  createdTime: string;
 };
 
 export type IsEnabledParams = {
@@ -64,7 +65,7 @@ export function isEnabled(params: string | IsEnabledParams): boolean {
   return defaultValue;
 }
 
-type CreateFeatureParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
+type CreateFeatureParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdTime">;
 
 /**
  * Create one or multiple new Features
@@ -85,6 +86,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
         _inheritsPermissions: true,
         _childOrder: "_name ASC",
         type: "no.item.feature-toggles:space",
+        createdTime: Instant.now().toString(),
       });
 
       log.info(`Created new space "${spaceKey}"`);
@@ -99,6 +101,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
         _parentPath: `/${feature.spaceKey ?? app.name}`,
         _inheritsPermissions: true,
         type: "no.item.feature-toggles:feature",
+        createdTime: Instant.now().toString(),
         data: {
           enabled: Boolean(feature.enabled),
           value: feature.value,
@@ -111,8 +114,8 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
     });
 }
 
-type UpdateByIdParams = Omit<Optional<Feature, "spaceKey">, "name" | "createdDate">;
-type UpdateByFeatureNameParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdDate">;
+type UpdateByIdParams = Omit<Optional<Feature, "spaceKey">, "name" | "createdTime">;
+type UpdateByFeatureNameParams = Omit<Optional<Feature, "spaceKey">, "id" | "createdTime">;
 
 /**
  * Update an existing Feature by ID or by Feature Name
@@ -172,8 +175,8 @@ export function publish(idOrKey: string | FeatureNodeKey): boolean {
 /**
  * Returns the nodes representing all spaces
  */
-export function getSpaces(): Node[] {
-  return getChildren({ parentKey: "/" });
+export function getSpaces(): Node<SpaceNode>[] {
+  return getChildren<SpaceNode>({ parentKey: "/" });
 }
 
 /**
@@ -232,6 +235,6 @@ function nodeToFeature(node: Node<FeatureNode>): Feature {
     value: node.data.value,
     spaceKey: node.data.spaceKey,
     description: node.data.description,
-    createdDate: node._ts,
+    createdTime: node.createdTime,
   };
 }
