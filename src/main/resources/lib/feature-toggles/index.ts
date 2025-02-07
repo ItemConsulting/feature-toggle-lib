@@ -1,4 +1,4 @@
-import { get as getContext } from "/lib/xp/context";
+import { get as getContext, run as runInContext } from "/lib/xp/context";
 import { connect, getChildren, query, type FeatureNode, type SpaceNode } from "./node";
 import { forceArray, notNullOrUndefined, unique, type Optional } from "./utils";
 export { initRepo, PRINCIPAL_KEY_ADMIN, PRINCIPAL_KEY_VIEWER } from "./repo";
@@ -98,7 +98,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
   forceArray(features)
     .filter((feature) => !connection.exists(`/${feature.spaceKey ?? app.name}/${feature.name}`))
     .forEach((feature) => {
-      connection.create<FeatureNode>({
+      const res = connection.create<FeatureNode>({
         _name: feature.name,
         _parentPath: `/${feature.spaceKey ?? app.name}`,
         _inheritsPermissions: true,
@@ -110,6 +110,12 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
           description: feature.description,
           spaceKey: feature.spaceKey ?? app.name,
         },
+      });
+
+      // Create space on "master" branch too
+      connection.push({
+        key: res._path,
+        target: "master",
       });
 
       log.info(`Created feature "${feature.name}" in space "${feature.spaceKey ?? app.name}"`);
@@ -167,24 +173,30 @@ export function publish(idOrKey: string | FeatureNodeKey): boolean {
   const res = connection.push({
     key: typeof idOrKey === "string" ? idOrKey : getFeatureNodePath(idOrKey),
     target: "master",
-    resolve: false, // prevent always publishing parent node too
   });
 
   connection.refresh("ALL");
 
   if (res.success.length > 0) {
-    writeToAuditLog({
-      type: "no.item.feature-toggles.publish",
-      objects: [`${REPO_NAME}:${idOrKey}`],
-      data: {
-        params: {
-          idOrKey,
-        },
-        result: {
-          pushedContents: res.success,
-        },
+    runInContext(
+      {
+        principals: ["role:system.admin"],
       },
-    });
+      () => {
+        writeToAuditLog({
+          type: "no.item.feature-toggles.publish",
+          objects: [`${REPO_NAME}:${idOrKey}`],
+          data: {
+            params: {
+              idOrKey,
+            },
+            result: {
+              pushedContents: res.success,
+            },
+          },
+        });
+      },
+    );
   }
 
   res.failed.forEach((failed) =>
