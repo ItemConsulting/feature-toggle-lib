@@ -9,8 +9,8 @@ type Branch = "draft" | "master";
 
 export type FeatureNodePath = `/${string}/${string}`;
 export type FeatureNodeKey = {
-  spaceKey: string;
   featureKey: string;
+  spaceKey?: string;
 };
 
 export type Feature = {
@@ -172,6 +172,21 @@ export function publish(idOrKey: string | FeatureNodeKey): boolean {
   return res.failed.length === 0;
 }
 
+export function remove(idOrKey: string | FeatureNodeKey): boolean {
+  const key = typeof idOrKey === "string" ? idOrKey : getFeatureNodePath(idOrKey);
+
+  try {
+    connect({ branch: "draft" }).delete(key);
+    connect({ branch: "master" }).delete(key);
+
+    log.info(`Removed feature with key="${key}"`);
+
+    return true;
+  } catch (e) {
+    log.error(`Failed to remove feature with key="${key}"`, e);
+    return false;
+  }
+}
 /**
  * Returns the nodes representing all spaces
  */
@@ -224,7 +239,7 @@ export function getFeatures(spaceKey?: string | string[], branch?: Branch): Feat
  * Create the path of a node based on the provided `spaceKey` and `featureKey`.
  */
 export function getFeatureNodePath({ spaceKey, featureKey }: FeatureNodeKey): FeatureNodePath {
-  return `/${spaceKey}/${featureKey}`;
+  return `/${spaceKey ?? app.name}/${featureKey}`;
 }
 
 function nodeToFeature(node: Node<FeatureNode>): Feature {
