@@ -112,12 +112,6 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
         },
       });
 
-      // Create space on "master" branch too
-      connection.push({
-        key: res._path,
-        target: "master",
-      });
-
       log.info(`Created feature "${feature.name}" in space "${feature.spaceKey ?? app.name}"`);
     });
 }
