@@ -8,11 +8,13 @@
   ],
 
   "compilerOptions": {
+    "strict": true,
     "lib": [
       "es2023" // string.replaceAll
     ],
     "types": [
-      "node"
+      "node",
+      "@itemconsulting/xp-storybook-utils/global"
     ],
   },
 }
