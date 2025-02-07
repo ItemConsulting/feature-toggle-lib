@@ -98,7 +98,7 @@ export function create(features: CreateFeatureParams[] | CreateFeatureParams): v
   forceArray(features)
     .filter((feature) => !connection.exists(`/${feature.spaceKey ?? app.name}/${feature.name}`))
     .forEach((feature) => {
-      const res = connection.create<FeatureNode>({
+      connection.create<FeatureNode>({
         _name: feature.name,
         _parentPath: `/${feature.spaceKey ?? app.name}`,
         _inheritsPermissions: true,
