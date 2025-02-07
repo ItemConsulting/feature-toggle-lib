@@ -16,6 +16,8 @@
     "@enonic-types/global": "^7.14.4",
     "@enonic-types/lib-auth": "^7.14.4",
     "@enonic-types/lib-context": "^7.14.4",
+    "@enonic-types/lib-event": "^7.14.4",
+    "@enonic-types/lib-auditlog": "^7.14.4",
     "@enonic-types/lib-node": "^7.14.4",
     "@enonic-types/lib-portal": "^7.14.4",
     "@enonic-types/lib-repo": "^7.14.4",

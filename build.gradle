@@ -8,7 +8,9 @@ plugins {
 dependencies {
   compileOnly "com.enonic.xp:core-api:${xpVersion}"
   implementation "com.enonic.xp:lib-auth:${xpVersion}"
+  implementation "com.enonic.xp:lib-auditlog:${xpVersion}"
   implementation "com.enonic.xp:lib-context:${xpVersion}"
+  implementation "com.enonic.xp:lib-event:${xpVersion}"
   implementation "com.enonic.xp:lib-node:${xpVersion}"
   implementation "com.enonic.xp:lib-portal:${xpVersion}"
   implementation "com.enonic.xp:lib-repo:${xpVersion}"

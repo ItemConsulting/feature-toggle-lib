@@ -2,6 +2,8 @@ import { get as getContext } from "/lib/xp/context";
 import { connect, getChildren, query, type FeatureNode, type SpaceNode } from "./node";
 import { forceArray, notNullOrUndefined, unique, type Optional } from "./utils";
 export { initRepo, PRINCIPAL_KEY_ADMIN, PRINCIPAL_KEY_VIEWER } from "./repo";
+import { log as writeToAuditLog } from "/lib/xp/auditlog";
+import { REPO_NAME } from "./constants";
 import { Instant } from "/lib/time";
 import type { Node } from "/lib/xp/node";
 
@@ -165,9 +167,29 @@ export function publish(idOrKey: string | FeatureNodeKey): boolean {
   const res = connection.push({
     key: typeof idOrKey === "string" ? idOrKey : getFeatureNodePath(idOrKey),
     target: "master",
+    resolve: false, // prevent always publishing parent node too
   });
 
-  res.failed.forEach((failed) => log.error(`Failed to publish feature ${failed.id} to master: ${failed.reason}`));
+  connection.refresh("ALL");
+
+  if (res.success.length > 0) {
+    writeToAuditLog({
+      type: "no.item.feature-toggles.publish",
+      objects: [`${REPO_NAME}:${idOrKey}`],
+      data: {
+        params: {
+          idOrKey,
+        },
+        result: {
+          pushedContents: res.success,
+        },
+      },
+    });
+  }
+
+  res.failed.forEach((failed) =>
+    log.error(`Failed to publish node with id "${failed.id}" to master: ${failed.reason}`),
+  );
 
   return res.failed.length === 0;
 }
