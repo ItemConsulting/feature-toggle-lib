@@ -4,12 +4,14 @@ Library for creating _Feature Toggles_, and checking if they have been enabled/d
 [Feature Toggles App](https://github.com/ItemConsulting/xp-feature-toggles). A _feature toggle_ is is a boolean flag
 that can be used in your application to enable/disable functionality.
 
+[![](https://repo.itemtest.no/api/badge/latest/releases/no/item/lib-xp-feature-toggles)](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggles)
+
+![Icon](docs/icon.svg)
+
 Common usages of feature toggles are:
 - Merging partially implemented features into your codebase, but not exposing them to the end users
 - A feature switch (kill switch?) that can be used by the admins/editors
 - Enable a feature on the `"draft"` branch, but not on `"master"`.
-
-[![](https://repo.itemtest.no/api/badge/latest/releases/no/item/lib-xp-feature-toggle)](https://repo.itemtest.no/#/releases/no/item/lib-xp-feature-toggle)
 
 > [!TIP]
 > We recommend that you use the _Feature Toggle App_ to toggle feature flags instead of using this library to do it programmatically.
